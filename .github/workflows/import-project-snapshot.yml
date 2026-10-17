@@ -25,6 +25,7 @@ jobs:
           git -C /tmp/project-source checkout --quiet --detach FETCH_HEAD
           rsync -a --exclude='/.git/' --exclude='/.github/workflows/python-tests.yml' /tmp/project-source/ ./
           git add -A
+          find experiments -type f -name '*.csv' -print0 | xargs -0 -r git add -f --
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if ! git diff --cached --quiet; then
