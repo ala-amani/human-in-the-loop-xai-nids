@@ -1,0 +1,11 @@
+scenario,variant,evaluated_rows,baseline_rate_mean,feedback_rate_mean,relative_change_pct_mean,relative_change_pct_min_across_seeds,relative_change_pct_max_across_seeds,corrected_errors_min,corrected_errors_max,introduced_errors_min,introduced_errors_max,recall_delta_mean,accuracy_delta_mean
+A_all_rows,false_positive_feedback,22544,0.025806,0.017362,-32.72,-36.69,-28.23,72,92,0,2,-0.00586,7.1e-05
+A_all_rows,wrong_attack_class_feedback,22544,0.016785,0.001138,-93.08,-97.19,-88.26,185,245,0,23,0.003413,0.010868
+B_no_test_duplicates,false_positive_feedback,22487,0.025883,0.017414,-32.72,-36.69,-28.23,72,92,0,2,-0.005873,7.1e-05
+B_no_test_duplicates,wrong_attack_class_feedback,22487,0.016822,0.00114,-93.08,-97.19,-88.26,185,245,0,23,0.003421,0.010895
+C_no_train_overlap,false_positive_feedback,21880,0.02411,0.015574,-35.4,-39.74,-30.57,72,92,0,2,-0.00611,8.2e-05
+C_no_train_overlap,wrong_attack_class_feedback,21880,0.017549,0.00119,-93.08,-97.19,-88.26,185,245,0,23,0.003569,0.011197
+D_no_duplicates_or_overlap,false_positive_feedback,21833,0.02417,0.015613,-35.4,-39.74,-30.57,72,92,0,2,-0.006122,8.3e-05
+D_no_duplicates_or_overlap,wrong_attack_class_feedback,21833,0.017582,0.001192,-93.08,-97.19,-88.26,185,245,0,23,0.003575,0.011222
+E_strict_cross_fold,false_positive_feedback,21796,0.024211,0.015639,-35.4,-39.74,-30.57,72,92,0,2,-0.006132,8.3e-05
+E_strict_cross_fold,wrong_attack_class_feedback,21796,0.017612,0.001194,-93.08,-97.19,-88.26,185,245,0,23,0.003582,0.011241
