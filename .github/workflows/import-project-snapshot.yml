@@ -1,0 +1,52 @@
+name: Import project snapshot
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-project-snapshot.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download project snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout --filter=blob:none https://github.com/ala-amani/detection.git /tmp/project-source
+          git -C /tmp/project-source fetch --quiet --depth=1 origin 2881e579f0473445e4f627aabe6e134b6922e8d1
+          git -C /tmp/project-source checkout --quiet --detach FETCH_HEAD
+          rsync -a --exclude='/.git/' /tmp/project-source/ ./
+          git add -A
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m "Import project snapshot with experimental results"
+            git push origin HEAD:main
+          fi
+      - name: Verify all source files have identical content
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess
+          def tracked(folder):
+              raw = subprocess.check_output(['git','-C',folder,'ls-tree','-r','HEAD'], text=True)
+              return {line.split('\t',1)[1]: line.split()[2] for line in raw.splitlines()}
+          old = tracked('/tmp/project-source')
+          new = tracked('.')
+          differences = {p: (sha, new.get(p)) for p, sha in old.items() if new.get(p)!=sha}
+          print('Source files:',len(old),'Destination files:',len(new),'Differences:',len(differences))
+          if differences:
+              print(differences)
+              raise SystemExit(1)
+          assert len(old)==185
+          PY
