@@ -1,0 +1,26 @@
+name: Python tests and archived-result check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest scapy
+      - name: Compile Python source
+        run: python -m compileall -q src examples tests experiments
+      - name: Run pytest
+        run: python -m pytest -q
+      - name: Verify archived feedback results
+        run: python experiments/2026-10-16-full-dataset-feedback/verify_recorded_results.py
