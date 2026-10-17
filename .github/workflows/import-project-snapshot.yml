@@ -25,7 +25,6 @@ jobs:
           git -C /tmp/project-source checkout --quiet --detach FETCH_HEAD
           rsync -a --exclude='/.git/' /tmp/project-source/ ./
           git add -A
-          git diff --cached --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if ! git diff --cached --quiet; then
