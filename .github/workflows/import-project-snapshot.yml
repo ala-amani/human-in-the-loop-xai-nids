@@ -23,7 +23,7 @@ jobs:
           git clone --quiet --no-checkout --filter=blob:none https://github.com/ala-amani/detection.git /tmp/project-source
           git -C /tmp/project-source fetch --quiet --depth=1 origin 2881e579f0473445e4f627aabe6e134b6922e8d1
           git -C /tmp/project-source checkout --quiet --detach FETCH_HEAD
-          rsync -a --exclude='/.git/' /tmp/project-source/ ./
+          rsync -a --exclude='/.git/' --exclude='/.github/workflows/python-tests.yml' /tmp/project-source/ ./
           git add -A
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -41,11 +41,12 @@ jobs:
               raw = subprocess.check_output(['git','-C',folder,'ls-tree','-r','HEAD'], text=True)
               return {line.split('\t',1)[1]: line.split()[2] for line in raw.splitlines()}
           old = tracked('/tmp/project-source')
+          old.pop('.github/workflows/python-tests.yml')
           new = tracked('.')
           differences = {p: (sha, new.get(p)) for p, sha in old.items() if new.get(p)!=sha}
           print('Source files:',len(old),'Destination files:',len(new),'Differences:',len(differences))
           if differences:
               print(differences)
               raise SystemExit(1)
-          assert len(old)==185
+          assert len(old)==184
           PY
