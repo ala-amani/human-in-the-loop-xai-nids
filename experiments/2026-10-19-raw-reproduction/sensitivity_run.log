@@ -1,0 +1,12 @@
+seed 42 done in 65 s | FPR A 0.0255->0.0183 | FPR E 0.0239->0.0166
+seed 43 done in 66 s | FPR A 0.0258->0.0171 | FPR E 0.0243->0.0154
+seed 44 done in 66 s | FPR A 0.0263->0.0174 | FPR E 0.0247->0.0157
+seed 45 done in 66 s | FPR A 0.0258->0.0178 | FPR E 0.0243->0.0161
+seed 46 done in 65 s | FPR A 0.0255->0.0162 | FPR E 0.0239->0.0144
+{
+  "A_all_rows": 22544,
+  "B_no_test_duplicates": 22487,
+  "C_no_train_overlap": 21880,
+  "D_no_duplicates_or_overlap": 21833,
+  "E_strict_cross_fold": 21796
+}

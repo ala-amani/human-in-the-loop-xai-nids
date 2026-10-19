@@ -1,0 +1,52 @@
+{
+  "train_rows": 125973,
+  "test_rows": 22544,
+  "duplicate_rows_within_train": 16,
+  "duplicate_rows_within_test": 57,
+  "test_rows_also_present_in_train": 664,
+  "test_rows_also_present_in_train_with_different_label": 50,
+  "fold_split": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42) over the test set",
+  "folds": [
+    {
+      "fold": 1,
+      "holdout_rows": 4509,
+      "holdout_rows_with_duplicate_in_feedback_partition": 17,
+      "of_which_label_differs": 14,
+      "same_label_duplicates": 3
+    },
+    {
+      "fold": 2,
+      "holdout_rows": 4509,
+      "holdout_rows_with_duplicate_in_feedback_partition": 13,
+      "of_which_label_differs": 13,
+      "same_label_duplicates": 0
+    },
+    {
+      "fold": 3,
+      "holdout_rows": 4509,
+      "holdout_rows_with_duplicate_in_feedback_partition": 24,
+      "of_which_label_differs": 22,
+      "same_label_duplicates": 2
+    },
+    {
+      "fold": 4,
+      "holdout_rows": 4509,
+      "holdout_rows_with_duplicate_in_feedback_partition": 16,
+      "of_which_label_differs": 16,
+      "same_label_duplicates": 0
+    },
+    {
+      "fold": 5,
+      "holdout_rows": 4508,
+      "holdout_rows_with_duplicate_in_feedback_partition": 20,
+      "of_which_label_differs": 19,
+      "same_label_duplicates": 1
+    }
+  ],
+  "totals": {
+    "holdout_rows_with_duplicate_in_feedback_partition": 90,
+    "share_of_test_set": 0.003992193044712562,
+    "same_label_duplicates": 6,
+    "share_of_test_set_same_label": 0.00026614620298083747
+  }
+}

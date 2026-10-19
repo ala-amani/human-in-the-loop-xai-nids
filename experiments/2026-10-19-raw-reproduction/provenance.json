@@ -1,0 +1,26 @@
+{
+  "data_origin": "NSL-KDD data described at https://www.unb.ca/cic/datasets/nsl.html",
+  "download_mirror": "https://github.com/jmnwong/NSL-KDD-Dataset",
+  "note": "UNB currently states the official direct dataset download is unavailable; this uses a public archival mirror, NOT a fresh file from UNB.",
+  "data_files": {
+    "KDDTrain+.txt": {
+      "rows": 125973,
+      "bytes": 19109424,
+      "sha256": "1b86d2f957b33082081bba410fe129b475efebcc13c9014c3f447c8271aadf95"
+    },
+    "KDDTest+.txt": {
+      "rows": 22544,
+      "bytes": 3441513,
+      "sha256": "fa46b0935342616aa83b7c2578db355b6a7aaabbc492248172c7a1e8b7ab8f84"
+    }
+  },
+  "python": "3.12.15",
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.0",
+    "matplotlib": "3.10.8"
+  },
+  "github_sha": "9fef00878130b4d762fb3ec8205845aca2bc48e8"
+}
