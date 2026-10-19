@@ -19,11 +19,21 @@ jobs:
         run: |
           python -m pip install -e . pytest scapy
           python -m pytest -q tests/test_generative_explainer.py tests/test_llm_ui_commentary.py
-      - name: Start Ollama container
+      - name: Install and start local Ollama
+        shell: bash
         run: |
-          docker run -d --name local-ollama -p 11434:11434 ollama/ollama:latest
-          docker exec local-ollama ollama pull qwen3:4b
-          docker exec local-ollama ollama list
+          set -euo pipefail
+          curl --fail --show-error --silent --location --retry 4 'https://ollama.com/install.sh' | sh
+          ollama serve > /tmp/ollama-local-server.log 2>&1 &
+          for attempt in $(seq 1 120); do
+            if curl --silent --fail http://127.0.0.1:11434/api/tags >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl --fail --silent --show-error http://127.0.0.1:11434/api/tags
+          ollama pull qwen3:4b
+          ollama list
       - name: Run live Ollama audit
         run: |
           python experiments/2026-10-19-live-ollama-audit/live_model_audit.py --model qwen3:4b --timeout 240 --output-dir experiments/2026-10-19-live-ollama-audit/run_outputs
