@@ -12,6 +12,8 @@ import urllib.request
 from dataclasses import asdict, dataclass
 from typing import Any, Protocol, Sequence
 
+from src.explainability.grounding_guard import numeric_grounding_issues, review_claim_issues
+
 
 @dataclass(frozen=True)
 class FeatureEvidence:
@@ -42,6 +44,7 @@ class AnalystNarrative:
     validation_verdict: str
     review_recommendation: str
     human_review_question: str
+    source: str = "llm"
 
 
 class NarrativeClient(Protocol):
@@ -100,6 +103,100 @@ def strip_ollama_thinking(text: str) -> str:
     return content
 
 
+def _verified_fallback(event: AttackEvent, validation: Any | None) -> AnalystNarrative:
+    """Human-readable, deterministic account of the exact available evidence."""
+    signs = [
+        (
+            f"{item.feature}: standardized input {float(item.observed_value):+.3f}; "
+            f"signed SHAP contribution {float(item.contribution):+.4f} "
+            f"({'supports' if item.contribution >= 0 else 'opposes'} the prediction)."
+        )
+        for item in event.evidence
+    ]
+    verdict = getattr(validation, "verdict", "not assessed")
+    priority = getattr(validation, "review_priority", "requires human review")
+    score = getattr(validation, "reliability_score", None)
+    score_note = (
+        f" Validator heuristic score: {float(score):.3f}, not a calibrated probability."
+        if score is not None else ""
+    )
+    reviews = getattr(validation, "reviewed_alerts", None)
+    prior_note = (
+        " There are zero past human reviews: the Beta(1,1) estimate is a prior, not measured precision."
+        if reviews == 0 else ""
+    )
+    return AnalystNarrative(
+        title="Evidence summary (verified deterministic fallback)",
+        summary=(
+            f"The IDS predicted {event.predicted_class} with classifier confidence "
+            f"{event.confidence * 100:.2f}%. This is not a verified attack."
+        ),
+        observed_signs=signs,
+        reasoning=(
+            "Positive signed SHAP contributions support the classifier prediction and "
+            "negative contributions oppose it. These are attribution units, not "
+            "probability changes or causal evidence."
+        ),
+        confidence_note="Classifier confidence does not establish ground truth." + score_note + prior_note,
+        recommended_checks=[
+            "Compare the alert with packet capture, router logs and authorized maintenance records.",
+            "Have an analyst verify the outcome; never automatically change firewall policy.",
+        ],
+        limitations="No packet payload, source IP or specific destination port is supplied in this evidence.",
+        validation_verdict=f"Deterministic validator verdict: {verdict}.",
+        review_recommendation=f"Deterministic validator review priority: {priority}.",
+        human_review_question="Is the alert correct, a false positive, or the wrong attack class?",
+        source="deterministic_fallback",
+    )
+
+
+def _verified_chat_fallback(event: AttackEvent, validation: Any | None, question: str) -> str:
+    """Give only input-derived facts when LLM numeric claims fail checks."""
+    q = question.lower()
+    intro = "The generated chat reply was withheld because its numeric claims were not fully grounded. "
+    if "ip" in q or "payload" in q or "port" in q:
+        return intro + "The supplied SHAP evidence contains no source IP, destination port or packet payload."
+    if "block" in q or "proven" in q or "firewall" in q:
+        return intro + (
+            f"The predicted class is {event.predicted_class}; it is not proof of an attack. "
+            "A researcher must review network evidence. Do not automatically block traffic or alter firewall policy."
+        )
+    if "shap" in q or "caus" in q or "feature" in q:
+        positive = sorted((x for x in event.evidence if x.contribution > 0),
+                          key=lambda x: x.contribution, reverse=True)
+        negative = sorted((x for x in event.evidence if x.contribution < 0),
+                          key=lambda x: x.contribution)
+        supporting = (f"{positive[0].feature} ({positive[0].contribution:+.4f})"
+                      if positive else "none in the supplied evidence")
+        opposing = (f"{negative[0].feature} ({negative[0].contribution:+.4f})"
+                    if negative else "none in the supplied evidence")
+        return intro + (
+            f"Strongest supporting feature: {supporting}. Strongest opposing feature: {opposing}. "
+            "SHAP describes the classifier, not causality."
+        )
+    return intro + "Please review the signed SHAP values and deterministic validator result before making any decision."
+
+
+def _check_narrative(
+    narrative: AnalystNarrative, event: AttackEvent, validation: Any | None
+) -> list[str]:
+    parts = [
+        narrative.title, narrative.summary, *narrative.observed_signs,
+        narrative.reasoning, narrative.confidence_note, *narrative.recommended_checks,
+        narrative.limitations, narrative.validation_verdict,
+        narrative.review_recommendation, narrative.human_review_question,
+    ]
+    issues = numeric_grounding_issues("\n".join(parts), event, validation)
+    issues.extend(review_claim_issues(narrative.review_recommendation, validation))
+    expected = getattr(validation, "verdict", None)
+    if expected:
+        verdict_text = narrative.validation_verdict.lower().replace("_", " ")
+        for candidate in ("likely correct", "likely incorrect", "uncertain"):
+            if candidate != expected.replace("_", " ") and candidate in verdict_text:
+                issues.append("validator_verdict_mismatch")
+    return sorted(set(issues))
+
+
 class OllamaNarrativeClient:
     """Generate a grounded narrative through a local Ollama chat endpoint."""
 
@@ -114,6 +211,8 @@ class OllamaNarrativeClient:
         self.timeout = timeout
         self.last_metrics: dict[str, float | int | str] = {}
         self.last_raw_chat_content: str = ""
+        self.last_grounding_issues: list[str] = []
+        self.last_chat_grounding_issues: list[str] = []
 
     def explain(
         self, event: AttackEvent, validation: Any | None = None, language: str = "English"
@@ -189,7 +288,11 @@ class OllamaNarrativeClient:
             "prompt_tokens": int(body.get("prompt_eval_count", 0)),
             "generated_tokens": int(body.get("eval_count", 0)),
         }
-        return AnalystNarrative(**json.loads(content))
+        narrative = AnalystNarrative(**json.loads(content))
+        self.last_grounding_issues = _check_narrative(narrative, event, validation)
+        if self.last_grounding_issues:
+            return _verified_fallback(event, validation)
+        return narrative
 
     def chat(
         self, event: AttackEvent, validation: Any, history: list[dict[str, str]], question: str
@@ -230,7 +333,11 @@ class OllamaNarrativeClient:
         except urllib.error.URLError as exc:
             raise RuntimeError(f"Ollama is unavailable at {self.base_url}: {exc}") from exc
         self.last_raw_chat_content = str(body["message"]["content"])
-        return strip_ollama_thinking(self.last_raw_chat_content)
+        answer = strip_ollama_thinking(self.last_raw_chat_content)
+        self.last_chat_grounding_issues = numeric_grounding_issues(answer, event, validation)
+        if self.last_chat_grounding_issues:
+            return _verified_chat_fallback(event, validation, question)
+        return answer
 
 
 def explain_if_attack(
