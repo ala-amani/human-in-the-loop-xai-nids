@@ -1,6 +1,7 @@
 """Numeric grounding regression tests based on the recorded Qwen3 failure mode."""
 import json
 from dataclasses import asdict, replace
+from pathlib import Path
 
 from src.explainability.generative_explainer import (
     AnalystNarrative, AttackEvent, FeatureEvidence, OllamaNarrativeClient,
@@ -148,3 +149,22 @@ def test_missing_review_history_is_not_called_empirical_precision():
     event, validation = event_and_review()
     narrative = _verified_fallback(event, validation)
     assert "prior, not measured precision" in narrative.confidence_note
+
+def test_exact_archived_qwen_dos_error_is_rejected():
+    """Regression: exercise the actual recorded erroneous DoS explanation."""
+    file = (Path(__file__).resolve().parents[1]
+            / "experiments/2026-10-19-live-ollama-audit/run_outputs_guarded/live_model_outputs.json")
+    record = json.loads(file.read_text(encoding="utf-8"))
+    entry = next(item for item in record["records"] if item["scenario"] == "wifi_access_point_syn_burst")
+    raw = entry["event"]
+    event = AttackEvent(
+        predicted_class=raw["predicted_class"], confidence=raw["confidence"],
+        evidence=[FeatureEvidence(**row) for row in raw["evidence"]], flow_id=raw["flow_id"]
+    )
+    validation = ValidationAssessment(**entry["assessment"])
+    generated = next(item["structured"] for item in entry["responses"]
+                     if item["kind"] == "structured_narrative")
+    narrative = AnalystNarrative(**generated)
+    issues = _check_narrative(narrative, event, validation)
+    assert "unsupported_percentage_or_multiplier_conversion" in issues
+    assert "review_priority_mismatch" in issues
