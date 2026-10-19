@@ -1,6 +1,6 @@
 """Numeric grounding regression tests based on the recorded Qwen3 failure mode."""
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from src.explainability.generative_explainer import (
     AnalystNarrative, AttackEvent, FeatureEvidence, OllamaNarrativeClient,
@@ -48,9 +48,12 @@ def test_archived_incorrect_standardized_conversions_rejected():
 
 def test_unsupported_probability_and_review_priority_rejected():
     event, validation = event_and_review()
-    bad = base_narrative()
-    bad.observed_signs.append("Rejected errors were 23 percent lower than the mean.")
-    bad.review_recommendation = "Prioritize urgent review with high priority."
+    original = base_narrative()
+    bad = replace(
+        original,
+        observed_signs=[*original.observed_signs, "Rejected errors were 23 percent lower than the mean."],
+        review_recommendation="Prioritize urgent review with high priority.",
+    )
     issues = _check_narrative(bad, event, validation)
     assert "unsupported_percentage_or_multiplier_conversion" in issues
     assert "review_priority_mismatch" in issues
