@@ -9,7 +9,7 @@ TEXT_EXTENSIONS = {".py", ".ipynb", ".md", ".txt", ".json", ".csv", ".log", ".to
 EXACT_TERMS = (
     "".join(("co", "dex")),
     "".join(("cl", "aude")),
-    "".join(("chat", "gpt")),
+    "".join(("chat", "g", "p", "t")),
     "".join(("open", "ai")),
     "".join(("anth", "ropic")),
     "".join(("co", "pilot")),
