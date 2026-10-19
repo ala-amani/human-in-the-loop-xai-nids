@@ -84,7 +84,6 @@ def main() -> None:
     validator = AlertValidator(FeedbackStore(args.feedback_store))
     client = OllamaNarrativeClient() if args.ollama else None
     results = []
-    interactive = None
     for _, row in matches.iterrows():
         event, model_features = evaluate_flow(row, namespace)
         assessment = validator.assess(event)
@@ -97,15 +96,12 @@ def main() -> None:
             "validation": asdict(assessment),
             "narrative": asdict(narrative) if narrative else None,
         })
-        if args.show_alert:
-            interactive = (event, model_features, assessment, narrative)
+        if args.show_alert and narrative is not None:
+            show_attack_alert(event, narrative, client, validator, assessment, model_features)
     result = results if args.scenario == "all" else results[0]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))
-    if interactive and interactive[3]:
-        event, model_features, assessment, narrative = interactive
-        show_attack_alert(event, narrative, client, validator, assessment, model_features)
 
 
 if __name__ == "__main__":
