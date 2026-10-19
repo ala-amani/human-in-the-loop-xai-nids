@@ -65,7 +65,7 @@ def test_readable_deterministic_fallback_uses_exact_evidence():
     explanation = _verified_fallback(event, validation)
     rendered = format_llm_commentary(explanation)
     assert explanation.source == "deterministic_fallback"
-    assert "VERIFIED RULE-BASED FALLBACK" in rendered
+    assert "DETERMINISTIC EVIDENCE SUMMARY" in rendered
     assert "1.770" in rendered and "-0.230" in rendered
     assert "23% below" not in rendered
     assert "review priority: routine" in rendered
