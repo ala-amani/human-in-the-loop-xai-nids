@@ -168,3 +168,21 @@ def test_exact_archived_qwen_dos_error_is_rejected():
     issues = _check_narrative(narrative, event, validation)
     assert "unsupported_percentage_or_multiplier_conversion" in issues
     assert "review_priority_mismatch" in issues
+
+
+def test_interactive_chat_withholds_inconsistent_review_priority(monkeypatch):
+    event, validation = event_and_review()
+    raw_answer = "This alert requires urgent high priority review immediately."
+    response = {"model": "qwen3:4b", "message": {"content": raw_answer}}
+
+    class Response:
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+        def read(self): return json.dumps(response).encode()
+
+    monkeypatch.setattr("urllib.request.urlopen", lambda *_args, **_kwargs: Response())
+    client = OllamaNarrativeClient()
+    answer = client.chat(event, validation, [], "Is the alert proven?")
+    assert "withheld" in answer
+    assert "urgent high priority" not in answer
+    assert "review_priority_mismatch" in client.last_chat_grounding_issues
