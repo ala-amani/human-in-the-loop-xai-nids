@@ -76,7 +76,10 @@ def format_llm_commentary(narrative) -> str:
         ("Review recommendation", narrative.review_recommendation),
         ("Question for analyst", narrative.human_review_question),
     ]
-    parts = ["LOCAL LLM COMMENTARY (GENERATED; ADVISORY)"]
+    heading = ("VERIFIED RULE-BASED FALLBACK (GENERATED TEXT WITHHELD)"
+               if getattr(narrative, "source", "llm") == "deterministic_fallback"
+               else "LOCAL LLM COMMENTARY (GENERATED; ADVISORY)")
+    parts = [heading]
     for label, value in fields:
         rendered = "; ".join(str(item) for item in value) if isinstance(value, (list, tuple)) else str(value)
         parts.append(f"{label}: {rendered}")
