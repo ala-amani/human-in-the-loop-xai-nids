@@ -36,7 +36,7 @@ jobs:
           ollama list
       - name: Run live Ollama audit
         run: |
-          python experiments/2026-10-19-live-ollama-audit/live_model_audit.py --model qwen3:4b --timeout 240 --output-dir experiments/2026-10-19-live-ollama-audit/run_outputs
+          PYTHONPATH=. python experiments/2026-10-19-live-ollama-audit/live_model_audit.py --model qwen3:4b --timeout 240 --output-dir experiments/2026-10-19-live-ollama-audit/run_outputs
       - name: Upload real model outputs
         if: always()
         uses: actions/upload-artifact@v4
