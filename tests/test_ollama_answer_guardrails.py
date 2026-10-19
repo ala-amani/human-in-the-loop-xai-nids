@@ -10,7 +10,7 @@ from src.explainability.generative_explainer import AttackEvent, FeatureEvidence
 
 def test_internal_reasoning_is_not_returned_to_analyst() -> None:
     """Exclude tagged internal model text from the final user-facing answer."""
-    assert strip_ollama_thinking("Private thoughts\\n</think>\\nFinal analyst guidance") == "Final analyst guidance"
+    assert strip_ollama_thinking("Private thoughts\n</think>\nFinal analyst guidance") == "Final analyst guidance"
     assert strip_ollama_thinking("Final analyst guidance") == "Final analyst guidance"
 
 
@@ -32,7 +32,7 @@ def test_chat_preserves_raw_audit_and_returns_only_final(monkeypatch) -> None:
             return False
 
         def read(self):
-            return json.dumps({"message": {"content": "Intermediate reasoning\\n</think>\\nNo source IP is present."}}).encode()
+            return json.dumps({"message": {"content": "Intermediate reasoning\n</think>\nNo source IP is present."}}).encode()
 
     def fake_urlopen(request, timeout):
         seen["payload"] = json.loads(request.data.decode("utf-8"))
