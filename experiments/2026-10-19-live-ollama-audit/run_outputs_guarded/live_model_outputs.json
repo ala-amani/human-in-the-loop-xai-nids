@@ -1,0 +1,400 @@
+{
+  "run_utc": "2026-10-19T13:33:26.618801+00:00",
+  "type": "new_live_ollama_backend_and_ui_formatter_audit",
+  "not_tested": [
+    "historical human feedback authenticity",
+    "old screenshots or old run replay",
+    "real-world traffic detection accuracy",
+    "human-driven clicks in graphical desktop interface",
+    "subjective analyst accuracy or time savings"
+  ],
+  "model_requested": "qwen3:4b",
+  "endpoint": "http://127.0.0.1:11434",
+  "scenarios": 4,
+  "new_model_responses": 12,
+  "automatic_flags": 10,
+  "api_or_schema_errors": 0,
+  "semantic_review_status": "requires separate per-response review",
+  "records": [
+    {
+      "scenario": "normal_web_benign_guard",
+      "context": "Synthetic benign control; not a prior model output",
+      "event": {
+        "predicted_class": "Normal",
+        "confidence": 0.96,
+        "evidence": [],
+        "flow_id": "audit-benign"
+      },
+      "assessment": {
+        "reliability_score": 0.707,
+        "verdict": "uncertain",
+        "evidence_agreement": 0.5,
+        "historical_precision": 0.5,
+        "reviewed_alerts": 0,
+        "review_priority": "high",
+        "reasons": [
+          "Classifier confidence is 0.960.",
+          "Supporting SHAP mass represents 50.0% of the selected attribution mass.",
+          "Historical analyst-confirmed precision for Normal is 50.0% across 0 reviewed alerts.",
+          "The reliability estimate prioritizes human review and cannot establish ground truth."
+        ]
+      },
+      "original_human_feedback": "NOT_AVAILABLE_AND_NOT_SIMULATED",
+      "responses": [],
+      "errors": [],
+      "benign_gate_checked": true
+    },
+    {
+      "scenario": "router_port_probe_low_confidence",
+      "context": "Synthetic contradictory evidence; not an archived reviewer outcome",
+      "event": {
+        "predicted_class": "Probe",
+        "confidence": 0.51,
+        "evidence": [
+          {
+            "feature": "diff_srv_rate",
+            "observed_value": 1.18,
+            "contribution": 0.16,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_srv_count",
+            "observed_value": -0.74,
+            "contribution": -0.21,
+            "direction": "opposes prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_diff_srv_rate",
+            "observed_value": 0.48,
+            "contribution": 0.06,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          }
+        ],
+        "flow_id": "audit-router-probe"
+      },
+      "assessment": {
+        "reliability_score": 0.5085697674418604,
+        "verdict": "uncertain",
+        "evidence_agreement": 0.5116279069767442,
+        "historical_precision": 0.5,
+        "reviewed_alerts": 0,
+        "review_priority": "high",
+        "reasons": [
+          "Classifier confidence is 0.510.",
+          "Supporting SHAP mass represents 51.2% of the selected attribution mass.",
+          "Historical analyst-confirmed precision for Probe is 50.0% across 0 reviewed alerts.",
+          "The reliability estimate prioritizes human review and cannot establish ground truth."
+        ]
+      },
+      "original_human_feedback": "NOT_AVAILABLE_AND_NOT_SIMULATED",
+      "responses": [
+        {
+          "kind": "structured_narrative",
+          "text": "Probe Alert Analysis\nNetwork reconnaissance activity detected with 51% confidence\nHigh rate of connections to different services (diff_srv_rate: 1.18); Lower count of recent connections to the destination host using the same service (dst_host_srv_count: -0.74); Moderate rate of different services used in recent traffic (dst_host_diff_srv_rate: 0.48)\nThe classifier predicts network reconnaissance (scanning) with 51% confidence. Evidence supports the prediction through higher-than-average service connection rates (diff_srv_rate: 1.18 and dst_host_diff_srv_rate: 0.48), but opposes it through lower-than-average service connection counts (dst_host_srv_count: -0.74). The reliability score (0.508) indicates uncertainty, matching the classifier's confidence level.\n51% confidence is borderline and considered low. This is not confirmation but a probability estimate.\nVerify if the traffic originates from a known scanning tool or legitimate maintenance activity; Check for associated port scans or service discovery attempts in the network logs; Confirm whether the destination host is a legitimate target for the observed traffic patterns\nNo prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. Reliability score is an uncalibrated heuristic.\nUncertain - evidence supports and opposes the prediction with similar weight\nPrioritize review due to high potential impact and borderline confidence\nShould this alert be labeled as correct, false positive, or wrong attack class?",
+          "structured": {
+            "title": "Probe Alert Analysis",
+            "summary": "Network reconnaissance activity detected with 51% confidence",
+            "observed_signs": [
+              "High rate of connections to different services (diff_srv_rate: 1.18)",
+              "Lower count of recent connections to the destination host using the same service (dst_host_srv_count: -0.74)",
+              "Moderate rate of different services used in recent traffic (dst_host_diff_srv_rate: 0.48)"
+            ],
+            "reasoning": "The classifier predicts network reconnaissance (scanning) with 51% confidence. Evidence supports the prediction through higher-than-average service connection rates (diff_srv_rate: 1.18 and dst_host_diff_srv_rate: 0.48), but opposes it through lower-than-average service connection counts (dst_host_srv_count: -0.74). The reliability score (0.508) indicates uncertainty, matching the classifier's confidence level.",
+            "confidence_note": "51% confidence is borderline and considered low. This is not confirmation but a probability estimate.",
+            "recommended_checks": [
+              "Verify if the traffic originates from a known scanning tool or legitimate maintenance activity",
+              "Check for associated port scans or service discovery attempts in the network logs",
+              "Confirm whether the destination host is a legitimate target for the observed traffic patterns"
+            ],
+            "limitations": "No prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. Reliability score is an uncalibrated heuristic.",
+            "validation_verdict": "Uncertain - evidence supports and opposes the prediction with similar weight",
+            "review_recommendation": "Prioritize review due to high potential impact and borderline confidence",
+            "human_review_question": "Should this alert be labeled as correct, false positive, or wrong attack class?"
+          },
+          "formatted_ui_text": "LOCAL LLM COMMENTARY (GENERATED; ADVISORY)\nTitle: Probe Alert Analysis\nSummary: Network reconnaissance activity detected with 51% confidence\nObserved signs: High rate of connections to different services (diff_srv_rate: 1.18); Lower count of recent connections to the destination host using the same service (dst_host_srv_count: -0.74); Moderate rate of different services used in recent traffic (dst_host_diff_srv_rate: 0.48)\nReasoning: The classifier predicts network reconnaissance (scanning) with 51% confidence. Evidence supports the prediction through higher-than-average service connection rates (diff_srv_rate: 1.18 and dst_host_diff_srv_rate: 0.48), but opposes it through lower-than-average service connection counts (dst_host_srv_count: -0.74). The reliability score (0.508) indicates uncertainty, matching the classifier's confidence level.\nConfidence note: 51% confidence is borderline and considered low. This is not confirmation but a probability estimate.\nRecommended checks: Verify if the traffic originates from a known scanning tool or legitimate maintenance activity; Check for associated port scans or service discovery attempts in the network logs; Confirm whether the destination host is a legitimate target for the observed traffic patterns\nLimitations: No prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. Reliability score is an uncalibrated heuristic.\nValidation verdict: Uncertain - evidence supports and opposes the prediction with similar weight\nReview recommendation: Prioritize review due to high potential impact and borderline confidence\nQuestion for analyst: Should this alert be labeled as correct, false positive, or wrong attack class?",
+          "generation": {
+            "provider": "Ollama",
+            "model": "qwen3:4b",
+            "total_duration_seconds": 116.094235597,
+            "load_duration_seconds": 3.554763585,
+            "prompt_tokens": 971,
+            "generated_tokens": 392
+          },
+          "automatic_flags": [
+            "unverified_percentage:50%"
+          ],
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Can the actual source IP address, destination port, or packet payload be determined from this evidence? State the limits explicitly.",
+          "text": "No. The evidence contains only feature contributions (e.g., `diff_srv_rate`, `dst_host_srv_count`) and their model attribution values. It explicitly does not include source IP addresses, destination ports, or packet payloads. The flow ID (`audit-router-probe`) is a system-generated label, not actual network details. The SHAP evidence explains *why* the model predicted \"Probe\" (51.2% of attribution mass supports the prediction), but it does not reveal packet contents, IPs, or ports. No raw traffic data is provided in the evidence.",
+          "raw_model_content": "Okay, the user is asking if we can determine the actual source IP, destination port, or packet payload from the given IDS evidence. Let me check the fixed event evidence and validation assessment carefully.\n\nFirst, looking at the evidence section: it only shows three features with their contributions - diff_srv_rate, dst_host_srv_count, and dst_host_diff_srv_rate. All these are numerical values with contributions. There's no mention of any IP addresses, ports, or payload data. The flow_id is \"audit-router-probe\" which is a label, not actual IPs.\n\nThe validation assessment also doesn't contain any IP/port/payload information. It has reliability scores and verdicts but nothing technical about the packet contents. \n\nI recall the instructions: don't invent any details that aren't there. The evidence explicitly states that SHAP explains model influence, not causality. The classifier only predicts \"Probe\" with 51% confidence, but the actual packet details aren't provided in the evidence. \n\nThe user wants to know if we can get source IP, destination port, or payload. From what's given, no - the evidence is purely about feature contributions. The IDS alert shows what the model thinks based on certain metrics, but doesn't reveal the actual network traffic details. \n\nAlso important: the validator says \"historical precision is 0.5 with zero reviewed alerts\" meaning no human verification has been done yet. So we can't confirm anything about the traffic. \n\nI should be clear that the answer is no, and explicitly state why: the evidence only contains feature contributions, not raw packet data. The flow_id is a system-generated label, not actual IPs. \n\nNeed to avoid saying anything about what could be inferred - the instructions say don't invent facts. Just state the limits based on what's provided. \n\nThe answer should be concise: no, and list the three specific things (source IP, dest port, payload) that can't be determined because the evidence doesn't contain them. The evidence only shows model features, not actual traffic details.\n</think>\n\nNo. The evidence contains only feature contributions (e.g., `diff_srv_rate`, `dst_host_srv_count`) and their model attribution values. It explicitly does not include source IP addresses, destination ports, or packet payloads. The flow ID (`audit-router-probe`) is a system-generated label, not actual network details. The SHAP evidence explains *why* the model predicted \"Probe\" (51.2% of attribution mass supports the prediction), but it does not reveal packet contents, IPs, or ports. No raw traffic data is provided in the evidence.",
+          "automatic_flags": [
+            "unverified_percentage:51.2%"
+          ],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Is this attack proven, and should the firewall automatically block a device? Explain what should happen next.",
+          "text": "No. This attack is **not proven** by the evidence. The model predicts \"Probe\" with 51% confidence, but the reliability score (0.508) and historical precision (50.0%) with zero reviewed alerts confirm the alert is **uncertain**. The SHAP evidence explains *why* the model predicted \"Probe\" (e.g., `diff_srv_rate` contributions), but it does **not** prove an actual attack occurred.  \n\n**Do not automatically block** the device. Automatic shutdowns risk blocking legitimate traffic and violate security best practices.  \n\n**What should happen next**:  \n1. **Human review** of the specific flow (`audit-router-probe`) to verify if the traffic matches a real probe attack (e.g., by inspecting packet payloads, source IPs, and port behavior).  \n2. **Update the IDS retraining workflow** with the verified outcome (e.g., \"false positive\" or \"true positive\") to improve future predictions.  \n3. **Do not modify firewall policy** based on this alert alone. The validator explicitly states human feedback establishes the reviewed outcome.",
+          "raw_model_content": "Okay, the user is asking two clear questions: whether this attack is proven and if the firewall should automatically block the device. Let me recall the context. The IDS alert has a predicted class \"Probe\" with 51% confidence, but the validation shows it's uncertain with 0 reviewed alerts and historical precision at 50%. \n\nFirst, I need to address \"proven\". The evidence doesn't show actual attack details—just model features like diff_srv_rate. The SHAP values explain model influence, not causality. So the attack isn't proven; it's just a model prediction. The reliability score is 0.508, which is low, and with zero reviewed alerts, we can't confirm anything. \n\nNext, the firewall auto-block question. The instructions say never to order automatic shutdowns. The validator's verdict is \"uncertain\", and the reasons list that human review is needed. So auto-blocking would be risky here—could block legitimate traffic. \n\nThe user might be a security analyst under pressure to act fast. They probably want a quick answer but I must emphasize verification. The next step is human review: check the flow ID (audit-router-probe) manually, look for actual packets, and confirm if it's a real probe. \n\nI should avoid technical jargon but stay precise. The answer must stress that proof requires human analysis, not the model. Also, the firewall shouldn't block without review—this is a high-priority alert but needs manual confirmation. \n\nKey points: Attack not proven, no auto-block, next step is human verification of the specific flow. Must not invent anything—stick to the evidence given. The historical precision being 50% with zero reviews means we can't trust the model here. \n\nI'll structure the response as: 1) Clear \"no\" to proven, 2) Explicit \"no\" to auto-block, 3) Next step (human review of flow). Keep it concise as per instructions.\n</think>\n\nNo. This attack is **not proven** by the evidence. The model predicts \"Probe\" with 51% confidence, but the reliability score (0.508) and historical precision (50.0%) with zero reviewed alerts confirm the alert is **uncertain**. The SHAP evidence explains *why* the model predicted \"Probe\" (e.g., `diff_srv_rate` contributions), but it does **not** prove an actual attack occurred.  \n\n**Do not automatically block** the device. Automatic shutdowns risk blocking legitimate traffic and violate security best practices.  \n\n**What should happen next**:  \n1. **Human review** of the specific flow (`audit-router-probe`) to verify if the traffic matches a real probe attack (e.g., by inspecting packet payloads, source IPs, and port behavior).  \n2. **Update the IDS retraining workflow** with the verified outcome (e.g., \"false positive\" or \"true positive\") to improve future predictions.  \n3. **Do not modify firewall policy** based on this alert alone. The validator explicitly states human feedback establishes the reviewed outcome.",
+          "automatic_flags": [
+            "unverified_percentage:50.0%"
+          ],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Identify the strongest supporting and opposing SHAP features and explain whether they establish causality.",
+          "text": "The strongest supporting SHAP feature is `diff_srv_rate` (contribution: **+0.16**), and the strongest opposing feature is `dst_host_srv_count` (contribution: **-0.21**).  \n\n**These do NOT establish causality**. SHAP explains *how the model influenced its prediction* (e.g., \"this feature pushes the model toward 'Probe'\"), but it **does not prove** that the feature caused the attack. The contributions reflect model attribution (e.g., \"the model sees this pattern as evidence for 'Probe'\"), not real-world causation. For example:  \n- `diff_srv_rate` being high might indicate many different services (a probe pattern), but this is the model’s interpretation, not proof that the traffic *caused* an attack.  \n- `dst_host_srv_count` being negative might indicate low service count (less likely to be a probe), but this is the model’s internal weighting, not a causal link to attack behavior.  \n\nSHAP identifies *model influence*, not causality. Human verification of traffic (e.g., inspecting IPs, ports, payloads) is required to determine if the features actually indicate an attack.",
+          "raw_model_content": "Okay, the user is asking about the strongest supporting and opposing SHAP features and whether they establish causality. Let me recall the evidence provided earlier. \n\nFirst, I need to extract the SHAP contributions from the fixed event evidence. The features listed are diff_srv_rate, dst_host_srv_count, and dst_host_diff_srv_rate. Their contributions are 0.16, -0.21, and 0.06 respectively. The directions show which support or oppose the prediction. \n\nThe strongest supporting feature is diff_srv_rate with a contribution of 0.16. The strongest opposing is dst_host_srv_count with -0.21. I should note that the contribution values are model attribution units, not percentages. \n\nNow, the user wants to know if these establish causality. From the context given earlier, SHAP explains model influence, not causality. The evidence shows how the model's prediction was influenced by these features, but it doesn't mean the features caused the attack. For example, a high diff_srv_rate might indicate many different services, which could be a probe pattern, but it's the model's interpretation, not direct causation. \n\nI should emphasize that SHAP doesn't prove causality. The model might have learned patterns from data, but without human verification, we can't say the features caused the attack. The user might be conflating model influence with actual cause, so clarifying that distinction is key here. \n\nAlso, the user's deeper need might be understanding if they can trust these features to take action. But the previous answers stressed that automatic actions aren't safe without review. So reinforcing that SHAP is for explanation, not causation, and that human review is necessary. \n\nNeed to be concise. List the strongest features, state they don't establish causality, and explain why based on SHAP's role as model attribution. Avoid technical jargon where possible. Make sure not to invent anything beyond the provided evidence.\n</think>\n\nThe strongest supporting SHAP feature is `diff_srv_rate` (contribution: **+0.16**), and the strongest opposing feature is `dst_host_srv_count` (contribution: **-0.21**).  \n\n**These do NOT establish causality**. SHAP explains *how the model influenced its prediction* (e.g., \"this feature pushes the model toward 'Probe'\"), but it **does not prove** that the feature caused the attack. The contributions reflect model attribution (e.g., \"the model sees this pattern as evidence for 'Probe'\"), not real-world causation. For example:  \n- `diff_srv_rate` being high might indicate many different services (a probe pattern), but this is the model’s interpretation, not proof that the traffic *caused* an attack.  \n- `dst_host_srv_count` being negative might indicate low service count (less likely to be a probe), but this is the model’s internal weighting, not a causal link to attack behavior.  \n\nSHAP identifies *model influence*, not causality. Human verification of traffic (e.g., inspecting IPs, ports, payloads) is required to determine if the features actually indicate an attack.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "wifi_access_point_syn_burst",
+      "context": "Synthetic evidence for a possible DoS; not captured PCAP",
+      "event": {
+        "predicted_class": "DoS",
+        "confidence": 0.86,
+        "evidence": [
+          {
+            "feature": "dst_host_srv_count",
+            "observed_value": 1.77,
+            "contribution": 0.24,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_rerror_rate",
+            "observed_value": -0.23,
+            "contribution": -0.08,
+            "direction": "opposes prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_diff_srv_rate",
+            "observed_value": 0.11,
+            "contribution": 0.03,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          }
+        ],
+        "flow_id": "audit-syn-burst"
+      },
+      "assessment": {
+        "reliability_score": 0.757,
+        "verdict": "likely_correct",
+        "evidence_agreement": 0.7714285714285714,
+        "historical_precision": 0.5,
+        "reviewed_alerts": 0,
+        "review_priority": "routine",
+        "reasons": [
+          "Classifier confidence is 0.860.",
+          "Supporting SHAP mass represents 77.1% of the selected attribution mass.",
+          "Historical analyst-confirmed precision for DoS is 50.0% across 0 reviewed alerts.",
+          "The reliability estimate prioritizes human review and cannot establish ground truth."
+        ]
+      },
+      "original_human_feedback": "NOT_AVAILABLE_AND_NOT_SIMULATED",
+      "responses": [
+        {
+          "kind": "structured_narrative",
+          "text": "DoS Alert: Service Disruption Attempt\nThe classifier predicts a DoS attack (service disruption via abnormal load) with 86% confidence. This alert indicates potential service disruption through abnormal traffic patterns.\nRecent connections to the destination host using the same service (1.77x average); Rejected connection errors below average (23% below training mean); Different services used in traffic (11% above average)\nThe classifier's prediction is supported by two features: higher-than-average connections to the same service (dst_host_srv_count) and higher-than-average service diversity (dst_host_diff_srv_rate). However, the rejected connection error rate (dst_host_rerror_rate) is below average, which opposes the prediction. The classifier's confidence (86%) is high but not certain, and the reliability score (75.7%) indicates moderate confidence in the alert's validity.\nThe classifier's confidence of 86% is high but not certain. The reliability score of 75.7% is a heuristic estimate, not a probability. This confidence level is borderline for automatic action without review.\nVerify the destination host's service usage patterns; Check for rejected connection errors in the affected service; Confirm traffic volume and service diversity metrics\nNo prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. The reliability score is an uncalibrated heuristic and does not represent ground truth.\nThe independent validation assesses the alert as likely correct based on classifier confidence and attribution mass agreement, but historical precision is 50% with no reviewed alerts.\nPrioritize review due to the classifier's high confidence (86%) and the opposing evidence from rejected connection errors.\nIs this alert a true DoS attempt, false positive, or misclassified attack type?",
+          "structured": {
+            "title": "DoS Alert: Service Disruption Attempt",
+            "summary": "The classifier predicts a DoS attack (service disruption via abnormal load) with 86% confidence. This alert indicates potential service disruption through abnormal traffic patterns.",
+            "observed_signs": [
+              "Recent connections to the destination host using the same service (1.77x average)",
+              "Rejected connection errors below average (23% below training mean)",
+              "Different services used in traffic (11% above average)"
+            ],
+            "reasoning": "The classifier's prediction is supported by two features: higher-than-average connections to the same service (dst_host_srv_count) and higher-than-average service diversity (dst_host_diff_srv_rate). However, the rejected connection error rate (dst_host_rerror_rate) is below average, which opposes the prediction. The classifier's confidence (86%) is high but not certain, and the reliability score (75.7%) indicates moderate confidence in the alert's validity.",
+            "confidence_note": "The classifier's confidence of 86% is high but not certain. The reliability score of 75.7% is a heuristic estimate, not a probability. This confidence level is borderline for automatic action without review.",
+            "recommended_checks": [
+              "Verify the destination host's service usage patterns",
+              "Check for rejected connection errors in the affected service",
+              "Confirm traffic volume and service diversity metrics"
+            ],
+            "limitations": "No prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. The reliability score is an uncalibrated heuristic and does not represent ground truth.",
+            "validation_verdict": "The independent validation assesses the alert as likely correct based on classifier confidence and attribution mass agreement, but historical precision is 50% with no reviewed alerts.",
+            "review_recommendation": "Prioritize review due to the classifier's high confidence (86%) and the opposing evidence from rejected connection errors.",
+            "human_review_question": "Is this alert a true DoS attempt, false positive, or misclassified attack type?"
+          },
+          "formatted_ui_text": "LOCAL LLM COMMENTARY (GENERATED; ADVISORY)\nTitle: DoS Alert: Service Disruption Attempt\nSummary: The classifier predicts a DoS attack (service disruption via abnormal load) with 86% confidence. This alert indicates potential service disruption through abnormal traffic patterns.\nObserved signs: Recent connections to the destination host using the same service (1.77x average); Rejected connection errors below average (23% below training mean); Different services used in traffic (11% above average)\nReasoning: The classifier's prediction is supported by two features: higher-than-average connections to the same service (dst_host_srv_count) and higher-than-average service diversity (dst_host_diff_srv_rate). However, the rejected connection error rate (dst_host_rerror_rate) is below average, which opposes the prediction. The classifier's confidence (86%) is high but not certain, and the reliability score (75.7%) indicates moderate confidence in the alert's validity.\nConfidence note: The classifier's confidence of 86% is high but not certain. The reliability score of 75.7% is a heuristic estimate, not a probability. This confidence level is borderline for automatic action without review.\nRecommended checks: Verify the destination host's service usage patterns; Check for rejected connection errors in the affected service; Confirm traffic volume and service diversity metrics\nLimitations: No prior alerts have been reviewed, so historical precision (50%) is a prior estimate, not measured precision. The reliability score is an uncalibrated heuristic and does not represent ground truth.\nValidation verdict: The independent validation assesses the alert as likely correct based on classifier confidence and attribution mass agreement, but historical precision is 50% with no reviewed alerts.\nReview recommendation: Prioritize review due to the classifier's high confidence (86%) and the opposing evidence from rejected connection errors.\nQuestion for analyst: Is this alert a true DoS attempt, false positive, or misclassified attack type?",
+          "generation": {
+            "provider": "Ollama",
+            "model": "qwen3:4b",
+            "total_duration_seconds": 107.383405681,
+            "load_duration_seconds": 0.000828324,
+            "prompt_tokens": 963,
+            "generated_tokens": 443
+          },
+          "automatic_flags": [
+            "unverified_percentage:11%",
+            "unverified_percentage:23%",
+            "unverified_percentage:50%",
+            "unverified_percentage:75.7%"
+          ],
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Can the actual source IP address, destination port, or packet payload be determined from this evidence? State the limits explicitly.",
+          "text": "No. The evidence contains only abstract feature contributions (e.g., `dst_host_srv_count: 1.77`), not raw packet data. The actual source IP, destination port, or packet payload cannot be determined from this alert. The flow ID (`audit-syn-burst`) indicates a specific traffic pattern but does not reveal IP addresses, ports, or payload content. SHAP contributions describe model influence on the prediction, not observed network details. Verification requires packet capture or deeper inspection.",
+          "raw_model_content": "Okay, the user is asking if we can determine the actual source IP, destination port, or packet payload from the provided IDS alert evidence. Let me carefully check what's available.\n\nLooking at the fixed event evidence section - it only shows feature values like dst_host_srv_count (1.77), dst_host_rerror_rate (-0.23), and dst_host_diff_srv_rate (0.11). These are statistical features derived from network flows, not raw packet data. \n\nThe evidence doesn't contain any IP addresses, port numbers, or payload content. The flow_id \"audit-syn-burst\" suggests this is a specific flow but doesn't reveal the actual IPs or ports. The SHAP contributions show how these features influence the DoS prediction, but they're abstract metrics - not raw network data.\n\nImportant to note: The validation assessment mentions \"historical precision of 0.5 with zero reviewed alerts\" which confirms no human verification has been done yet. The reliability score (0.757) is just a model heuristic, not actual correctness.\n\nThe user seems knowledgeable about security systems but might be confusing feature-level data with raw packet data. They're probably trying to understand if this alert gives actionable details for immediate response. But based on the evidence, we can't get the actual IPs/ports/payloads - that would require packet capture or deeper inspection.\n\nI should be clear about the limits: no IP addresses, ports, or payloads are present in this evidence. The model only outputs feature contributions, not the actual network traffic details. The recommendation should be to verify through packet inspection since the alert is \"likely_correct\" but still needs human review per the validation assessment.\n\nAlso need to remember not to invent anything - the evidence explicitly says no packet contents are provided. The answer must stay strictly within what's in the JSON.\n</think>\n\nNo. The evidence contains only abstract feature contributions (e.g., `dst_host_srv_count: 1.77`), not raw packet data. The actual source IP, destination port, or packet payload cannot be determined from this alert. The flow ID (`audit-syn-burst`) indicates a specific traffic pattern but does not reveal IP addresses, ports, or payload content. SHAP contributions describe model influence on the prediction, not observed network details. Verification requires packet capture or deeper inspection.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Is this attack proven, and should the firewall automatically block a device? Explain what should happen next.",
+          "text": "No, this attack is not proven. The evidence shows only model-influenced features (e.g., `dst_host_srv_count: 1.77`), not actual attack behavior or network details. Automatic firewall blocking is **never** permitted without human review.  \n\n**Next step**: Verify manually using packet capture or traffic inspection to confirm the alert’s validity. The validator explicitly states that ground truth requires human review (with 0 reviewed alerts currently), and the firewall policy must be updated *only* after human-confirmed outcomes are returned to the IDS retraining workflow. Do not act on this alert without verification.",
+          "raw_model_content": "Okay, the user is asking two clear questions: whether this attack is proven and if the firewall should automatically block the device. Let me recall the context. \n\nFirst, the IDS alert shows a DoS prediction with 86% confidence and SHAP evidence. But the validation says there are zero reviewed alerts, so historical precision is 50% - that's a very low baseline. The reliability score is 0.757, but the validator explicitly states it's an uncalibrated heuristic that can't establish ground truth. \n\nHmm... the user might be a security analyst who's pressed for time. They probably want a quick yes/no but I must be precise. The key here is the validation assessment: \"reviewed_alerts\": 0 and \"historical_precision\": 0.5. That means we have no human-verified data to confirm this alert. The SHAP evidence shows model influence but not actual attack behavior. \n\nFor the first question: \"proven\"? Absolutely not. The evidence only shows the model's reasoning, not real attack confirmation. The validator even says \"cannot establish ground truth.\" \n\nSecond question: automatic blocking? Never. The instructions say never to order automatic shutdowns. The firewall should only block after human review - which we don't have here since reviewed_alerts=0. \n\nWhat should happen next? The validation says \"reliability estimate prioritizes human review.\" So I must recommend manual verification. The user might be tempted to act fast, but the rules are clear: no automatic actions without review. \n\nAlso noting the user's deeper need: they likely want to avoid false positives (hence the 50% historical precision warning) while not missing real attacks. But with zero reviews, we can't tell. \n\nMust phrase carefully: \n- Attack isn't proven (emphasize \"no ground truth\") \n- No automatic block (cite the rules) \n- Next step: human review with specific actions (like packet capture) \n\nAvoid any technical jargon beyond what's necessary. The previous answer already explained why IPs/ports aren't visible, so I'll build on that. \n\n...Double-checking the validation reasons: \"The reliability estimate prioritizes human review and cannot establish ground truth.\" Perfect - that's the core here. \n\nFinal answer structure: \n1. Direct \"no\" to proven \n2. Direct \"no\" to automatic block \n3. Clear next step: human verification with specific methods (packet capture, etc.)\n</think>\n\nNo, this attack is not proven. The evidence shows only model-influenced features (e.g., `dst_host_srv_count: 1.77`), not actual attack behavior or network details. Automatic firewall blocking is **never** permitted without human review.  \n\n**Next step**: Verify manually using packet capture or traffic inspection to confirm the alert’s validity. The validator explicitly states that ground truth requires human review (with 0 reviewed alerts currently), and the firewall policy must be updated *only* after human-confirmed outcomes are returned to the IDS retraining workflow. Do not act on this alert without verification.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Identify the strongest supporting and opposing SHAP features and explain whether they establish causality.",
+          "text": "The strongest supporting SHAP feature is `dst_host_srv_count` (contribution: **+0.24**), and the strongest opposing feature is `dst_host_rerror_rate` (contribution: **-0.08**).  \n\nThese **do not establish causality**. SHAP contributions describe *how features influence the model’s prediction*, not actual cause-effect relationships in network traffic. The model may associate high `dst_host_srv_count` with DoS risk based on historical patterns, but this does not prove the traffic *caused* the attack. Similarly, `dst_host_rerror_rate` opposes the prediction but does not negate the underlying threat.  \n\n**Key limit**: SHAP explains model behavior, not real-world causality. The evidence confirms *model influence* only—not attack origin, device behavior, or payload content.",
+          "raw_model_content": "Okay, the user is asking about the strongest supporting and opposing SHAP features and whether they establish causality. Let me recall the evidence provided. \n\nFirst, looking at the SHAP contributions: the strongest supporting feature is `dst_host_srv_count` with a contribution of 0.24. The opposing feature is `dst_host_rerror_rate` with -0.08. The other feature, `dst_host_diff_srv_rate`, has a small positive contribution of 0.03, but it's weaker than the first one.\n\nThe user wants to know if these establish causality. I remember that SHAP explains model influence, not causality. So even though `dst_host_srv_count` is the strongest supporter, it doesn't mean it's the cause of the DoS attack. The model might have learned patterns where high service count correlates with DoS, but that doesn't prove causation. The opposing feature also doesn't negate the prediction—it's just a minor opposing factor.\n\nI should emphasize that SHAP contributions show how features influence the model's decision, not actual cause-effect relationships. The user might be conflating model influence with real-world causality. Also, the historical precision being 0.5 with no reviewed alerts means we can't trust the model's accuracy here. \n\nThe user's deeper need might be understanding if this alert is valid or if they should act on it. But the previous answers already clarified that automatic blocking isn't possible without verification. So here, I need to stick to the technical explanation without adding new info. \n\nMake sure to state clearly that SHAP doesn't establish causality, and the strongest features are as listed. Avoid any mention of packet details since the evidence doesn't have that. Also, the reliability score is 0.757 but that's a heuristic, not a probability of correctness. \n\nDouble-check the numbers: `dst_host_srv_count` is 0.24 (supports), `dst_host_rerror_rate` is -0.08 (opposes). Yep. And the explanation must be concise—no extra fluff. The user wants a direct answer based solely on the provided evidence.\n</think>\n\nThe strongest supporting SHAP feature is `dst_host_srv_count` (contribution: **+0.24**), and the strongest opposing feature is `dst_host_rerror_rate` (contribution: **-0.08**).  \n\nThese **do not establish causality**. SHAP contributions describe *how features influence the model’s prediction*, not actual cause-effect relationships in network traffic. The model may associate high `dst_host_srv_count` with DoS risk based on historical patterns, but this does not prove the traffic *caused* the attack. Similarly, `dst_host_rerror_rate` opposes the prediction but does not negate the underlying threat.  \n\n**Key limit**: SHAP explains model behavior, not real-world causality. The evidence confirms *model influence* only—not attack origin, device behavior, or payload content.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "authorized_router_health_check_uncertain",
+      "context": "Synthetic conflicting signals, with a benign operational possibility not established by the event",
+      "event": {
+        "predicted_class": "Probe",
+        "confidence": 0.67,
+        "evidence": [
+          {
+            "feature": "diff_srv_rate",
+            "observed_value": 0.93,
+            "contribution": 0.19,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_same_src_port_rate",
+            "observed_value": -0.53,
+            "contribution": -0.15,
+            "direction": "opposes prediction",
+            "baseline": 0.0
+          },
+          {
+            "feature": "dst_host_srv_count",
+            "observed_value": 0.21,
+            "contribution": 0.04,
+            "direction": "supports prediction",
+            "baseline": 0.0
+          }
+        ],
+        "flow_id": "audit-maintenance"
+      },
+      "assessment": {
+        "reliability_score": 0.6133421052631579,
+        "verdict": "uncertain",
+        "evidence_agreement": 0.6052631578947368,
+        "historical_precision": 0.5,
+        "reviewed_alerts": 0,
+        "review_priority": "high",
+        "reasons": [
+          "Classifier confidence is 0.670.",
+          "Supporting SHAP mass represents 60.5% of the selected attribution mass.",
+          "Historical analyst-confirmed precision for Probe is 50.0% across 0 reviewed alerts.",
+          "The reliability estimate prioritizes human review and cannot establish ground truth."
+        ]
+      },
+      "original_human_feedback": "NOT_AVAILABLE_AND_NOT_SIMULATED",
+      "responses": [
+        {
+          "kind": "structured_narrative",
+          "text": "Probe Alert Analysis\nNetwork reconnaissance activity detected with 67% confidence\nHigh rate of connections to different services (diff_srv_rate: 0.93); Lower rate of connections using same source port (dst_host_same_src_port_rate: -0.53); Moderate count of connections to the destination host using the same service (dst_host_srv_count: 0.21)\nThe classifier predicts network reconnaissance (scanning) with 67% confidence. Evidence supports the prediction through high service diversity (diff_srv_rate: 0.93) and moderate service count (dst_host_srv_count: 0.21). However, the lower source port reuse rate (dst_host_same_src_port_rate: -0.53) opposes the prediction. The reliability score of 0.61 indicates uncertainty, with historical precision at 50% (no prior reviews).\n67% confidence is borderline; reliability score of 0.61 suggests uncertainty\nVerify if the activity matches known scanning patterns (e.g., SYN floods, port scans); Check for legitimate maintenance traffic using flow ID 'audit-maintenance'; Confirm if the source IP is authorized for network reconnaissance\nNo prior alerts reviewed; historical precision is 50% (theoretical prior)\nUncertain (reliability score: 0.61, evidence agreement: 60.5%)\nPrioritize review due to high potential impact and borderline confidence\nIs this activity a legitimate maintenance scan (flow ID: audit-maintenance) or an unauthorized probe?",
+          "structured": {
+            "title": "Probe Alert Analysis",
+            "summary": "Network reconnaissance activity detected with 67% confidence",
+            "observed_signs": [
+              "High rate of connections to different services (diff_srv_rate: 0.93)",
+              "Lower rate of connections using same source port (dst_host_same_src_port_rate: -0.53)",
+              "Moderate count of connections to the destination host using the same service (dst_host_srv_count: 0.21)"
+            ],
+            "reasoning": "The classifier predicts network reconnaissance (scanning) with 67% confidence. Evidence supports the prediction through high service diversity (diff_srv_rate: 0.93) and moderate service count (dst_host_srv_count: 0.21). However, the lower source port reuse rate (dst_host_same_src_port_rate: -0.53) opposes the prediction. The reliability score of 0.61 indicates uncertainty, with historical precision at 50% (no prior reviews).",
+            "confidence_note": "67% confidence is borderline; reliability score of 0.61 suggests uncertainty",
+            "recommended_checks": [
+              "Verify if the activity matches known scanning patterns (e.g., SYN floods, port scans)",
+              "Check for legitimate maintenance traffic using flow ID 'audit-maintenance'",
+              "Confirm if the source IP is authorized for network reconnaissance"
+            ],
+            "limitations": "No prior alerts reviewed; historical precision is 50% (theoretical prior)",
+            "validation_verdict": "Uncertain (reliability score: 0.61, evidence agreement: 60.5%)",
+            "review_recommendation": "Prioritize review due to high potential impact and borderline confidence",
+            "human_review_question": "Is this activity a legitimate maintenance scan (flow ID: audit-maintenance) or an unauthorized probe?"
+          },
+          "formatted_ui_text": "LOCAL LLM COMMENTARY (GENERATED; ADVISORY)\nTitle: Probe Alert Analysis\nSummary: Network reconnaissance activity detected with 67% confidence\nObserved signs: High rate of connections to different services (diff_srv_rate: 0.93); Lower rate of connections using same source port (dst_host_same_src_port_rate: -0.53); Moderate count of connections to the destination host using the same service (dst_host_srv_count: 0.21)\nReasoning: The classifier predicts network reconnaissance (scanning) with 67% confidence. Evidence supports the prediction through high service diversity (diff_srv_rate: 0.93) and moderate service count (dst_host_srv_count: 0.21). However, the lower source port reuse rate (dst_host_same_src_port_rate: -0.53) opposes the prediction. The reliability score of 0.61 indicates uncertainty, with historical precision at 50% (no prior reviews).\nConfidence note: 67% confidence is borderline; reliability score of 0.61 suggests uncertainty\nRecommended checks: Verify if the activity matches known scanning patterns (e.g., SYN floods, port scans); Check for legitimate maintenance traffic using flow ID 'audit-maintenance'; Confirm if the source IP is authorized for network reconnaissance\nLimitations: No prior alerts reviewed; historical precision is 50% (theoretical prior)\nValidation verdict: Uncertain (reliability score: 0.61, evidence agreement: 60.5%)\nReview recommendation: Prioritize review due to high potential impact and borderline confidence\nQuestion for analyst: Is this activity a legitimate maintenance scan (flow ID: audit-maintenance) or an unauthorized probe?",
+          "generation": {
+            "provider": "Ollama",
+            "model": "qwen3:4b",
+            "total_duration_seconds": 98.514163575,
+            "load_duration_seconds": 0.00075585,
+            "prompt_tokens": 971,
+            "generated_tokens": 398
+          },
+          "automatic_flags": [
+            "unverified_percentage:50%",
+            "unverified_percentage:60.5%"
+          ],
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Can the actual source IP address, destination port, or packet payload be determined from this evidence? State the limits explicitly.",
+          "text": "No. The evidence provides only aggregated flow statistics (e.g., `diff_srv_rate`, `dst_host_same_src_port_rate`), not raw packet data. The actual source IP, destination port, or packet payload cannot be determined from this evidence. The flow_id \"audit-maintenance\" indicates a maintenance context but does not specify IPs or ports. SHAP contributions explain model influence on the prediction (e.g., how features *affect* the classifier), not the actual packet contents. The available evidence explicitly lacks packet-level details, and no human review has occurred to confirm the flow's specifics.",
+          "raw_model_content": "Okay, the user is asking if we can determine the actual source IP, destination port, or packet payload from the given IDS evidence. Let me check the fixed event evidence and validation assessment carefully.\n\nFirst, looking at the evidence section: it only shows three SHAP contributions for features like diff_srv_rate, dst_host_same_src_port_rate, and dst_host_srv_count. These are statistical features used by the IDS model, not raw packet data. The observed values are numerical (0.93, -0.53, 0.21) but no actual IPs or ports are mentioned. \n\nThe validation assessment confirms there are zero reviewed alerts, so no human verification has been done yet. The reliability score is 0.613, but that's just a heuristic estimate - it doesn't mean the alert is 61.3% correct. The historical precision is 50% with zero reviewed alerts, which is uninformative as stated.\n\nImportant technical points: SHAP values explain model influence, not actual packet contents. The features here are derived from network flows (like how many connections to same port), not raw packet data. The flow_id \"audit-maintenance\" suggests this is a maintenance flow, but still no specific IPs or ports.\n\nThe user might be trying to understand if they can take action (like blocking traffic) based on this alert. But the instructions say never to claim attacks are proven or order automatic shutdowns. Also, the validator only estimates reliability - human review is needed for ground truth.\n\nSo explicitly: no, we can't determine source IP, destination port, or payload. The evidence only shows aggregated flow statistics. The model uses these features to predict \"Probe\" attacks, but without raw packet inspection or human review, we don't have the actual addresses or payloads. \n\nI should state the limits clearly: the evidence is feature-level statistics, not packet-level data. The flow_id indicates it's a maintenance flow, but still no specific IPs. The SHAP contributions show which features influenced the prediction, but not the actual values of those features at the packet level.\n\nAlso need to remember not to invent anything - the evidence doesn't contain IPs or ports, so I can't say they exist. The answer must be strictly based on what's provided.\n</think>\n\nNo. The evidence provides only aggregated flow statistics (e.g., `diff_srv_rate`, `dst_host_same_src_port_rate`), not raw packet data. The actual source IP, destination port, or packet payload cannot be determined from this evidence. The flow_id \"audit-maintenance\" indicates a maintenance context but does not specify IPs or ports. SHAP contributions explain model influence on the prediction (e.g., how features *affect* the classifier), not the actual packet contents. The available evidence explicitly lacks packet-level details, and no human review has occurred to confirm the flow's specifics.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Is this attack proven, and should the firewall automatically block a device? Explain what should happen next.",
+          "text": "No, this attack is not proven, and the firewall should not automatically block the device. The evidence shows only aggregated flow statistics (e.g., `diff_srv_rate`), not raw packet data or device identities. The classifier's 67% confidence and SHAP contributions indicate model influence on prediction, not actual attack causality. With zero reviewed alerts and a historical precision of 50%, this alert cannot be confirmed as malicious.  \n\n**Next step**: Human review is required. The validator flags this as \"high\" priority due to the uncertain verdict and lack of reviewed outcomes. The analyst must manually inspect the flow (e.g., via network logs for `audit-maintenance` context) to determine if the traffic is legitimate or malicious before any action. Automatic blocking risks false positives and policy violations. Validated feedback will then update the IDS retraining workflow, not firewall rules.",
+          "raw_model_content": "Okay, the user is asking two clear questions: whether this attack is proven and if the firewall should automatically block the device. Let me recall the context. \n\nFirst, the IDS alert shows a \"Probe\" classification with 67% confidence. The SHAP evidence has three features: two supporting the prediction (diff_srv_rate and dst_host_srv_count) and one opposing (dst_host_same_src_port_rate). But the key point here is the validation assessment says \"verdict\": \"uncertain\" with 0 reviewed alerts and historical precision at 50%. \n\nHmm, the user might be a network admin who's stressed about false positives. They probably want a quick yes/no but I must be precise. The rules say: never claim attack is proven, never order automatic shutdown. Also, the reliability score is 0.613 but that's uncalibrated and based on historical data without human review. \n\nImportant: The evidence doesn't show packet payloads or IPs, so we can't even confirm the source. The flow_id \"audit-maintenance\" suggests it's a maintenance flow, not an attack. The SHAP contributions are about model influence, not causality—so we don't know if this is actually malicious. \n\nFor the next steps: The validation says \"review_priority\": \"high\" and \"reviewed_alerts\": 0. So human review is needed. The user might be tempted to block immediately, but that's risky. I should emphasize checking the flow manually—like looking at the actual traffic in the audit-maintenance context. \n\nAlso, the historical precision is 50% with zero reviews, meaning half of these alerts are false positives. So blocking without review could cause more issues. \n\nMy answer must be strict: no, not proven; no, don't block. Next step is human review. I'll avoid technical jargon but keep it clear. The user needs actionable steps without overpromising.\n</think>\n\nNo, this attack is not proven, and the firewall should not automatically block the device. The evidence shows only aggregated flow statistics (e.g., `diff_srv_rate`), not raw packet data or device identities. The classifier's 67% confidence and SHAP contributions indicate model influence on prediction, not actual attack causality. With zero reviewed alerts and a historical precision of 50%, this alert cannot be confirmed as malicious.  \n\n**Next step**: Human review is required. The validator flags this as \"high\" priority due to the uncertain verdict and lack of reviewed outcomes. The analyst must manually inspect the flow (e.g., via network logs for `audit-maintenance` context) to determine if the traffic is legitimate or malicious before any action. Automatic blocking risks false positives and policy violations. Validated feedback will then update the IDS retraining workflow, not firewall rules.",
+          "automatic_flags": [
+            "unverified_percentage:50%"
+          ],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        },
+        {
+          "kind": "interactive_chat",
+          "question": "Identify the strongest supporting and opposing SHAP features and explain whether they establish causality.",
+          "text": "The strongest supporting SHAP feature is `diff_srv_rate` (contribution: **+0.19**), and the strongest opposing feature is `dst_host_same_src_port_rate` (contribution: **-0.15**).  \n\nThese features **do not establish causality**. SHAP contributions explain *how much each feature influences the model's prediction* (e.g., \"this feature pushes the classifier toward 'Probe'\"), not the actual cause of the attack. The evidence shows aggregated flow statistics (e.g., `diff_srv_rate` indicates high service diversity in traffic), but **no raw packet data, IP addresses, or payload details are available** to confirm whether the traffic is malicious. Causality requires direct observation of attack behavior (e.g., packet payloads), which this evidence lacks.  \n\n**Why causality cannot be established**:  \n- SHAP quantifies *model influence*, not real-world causality (e.g., high `diff_srv_rate` may correlate with probing but does not prove the traffic *is* an attack).  \n- The evidence is flow-level statistics (not packet-level data), so the features reflect *patterns* in the traffic, not the *source* of the attack.  \n- Without human review, the validator cannot distinguish between legitimate maintenance traffic (e.g., `audit-maintenance` flows) and malicious activity.  \n\n**Next step**: Human review of the flow (e.g., checking `audit-maintenance` logs) is required to determine if the traffic is malicious. The validator’s \"high\" priority flag confirms this alert needs manual verification before any action.",
+          "raw_model_content": "Okay, the user is asking about the strongest supporting and opposing SHAP features and whether they establish causality. Let me recall the evidence provided. \n\nFirst, looking at the SHAP contributions: the strongest supporting feature is `diff_srv_rate` with a contribution of 0.19. The opposing feature is `dst_host_same_src_port_rate` with -0.15. The third feature `dst_host_srv_count` has a smaller contribution of 0.04, so it's not as strong.\n\nThe user wants to know if these establish causality. From what I remember, SHAP explains model influence, not causality. The contributions show how much each feature affects the prediction probability, but they don't prove that the feature caused the attack. For example, `diff_srv_rate` being high might indicate many different services, which could be a sign of probing, but it's not the actual cause. The model uses this feature as part of its decision, but without knowing the actual traffic, we can't say it's the cause.\n\nAlso, the user mentioned \"establish causality.\" I need to be clear that SHAP doesn't show causality. The evidence here is aggregated flow stats, not raw packets. So the features are indicators, not direct causes. The model might have learned patterns from past data, but without human review, we can't confirm causality.\n\nThe previous answers emphasized that the firewall shouldn't block automatically and that human review is needed. So the user might be trying to understand if this alert is actionable without further checks. But the key point here is that SHAP contributions don't prove causality, so the alert isn't proven.\n\nI should structure the answer to list the strongest features, explain their contributions, and clearly state that they don't establish causality. Also, mention that the evidence lacks packet details, so causality can't be determined from this data alone. The user might be a security analyst who needs to know if they can act on this without more info, but the answer is no—human review is necessary.\n</think>\n\nThe strongest supporting SHAP feature is `diff_srv_rate` (contribution: **+0.19**), and the strongest opposing feature is `dst_host_same_src_port_rate` (contribution: **-0.15**).  \n\nThese features **do not establish causality**. SHAP contributions explain *how much each feature influences the model's prediction* (e.g., \"this feature pushes the classifier toward 'Probe'\"), not the actual cause of the attack. The evidence shows aggregated flow statistics (e.g., `diff_srv_rate` indicates high service diversity in traffic), but **no raw packet data, IP addresses, or payload details are available** to confirm whether the traffic is malicious. Causality requires direct observation of attack behavior (e.g., packet payloads), which this evidence lacks.  \n\n**Why causality cannot be established**:  \n- SHAP quantifies *model influence*, not real-world causality (e.g., high `diff_srv_rate` may correlate with probing but does not prove the traffic *is* an attack).  \n- The evidence is flow-level statistics (not packet-level data), so the features reflect *patterns* in the traffic, not the *source* of the attack.  \n- Without human review, the validator cannot distinguish between legitimate maintenance traffic (e.g., `audit-maintenance` flows) and malicious activity.  \n\n**Next step**: Human review of the flow (e.g., checking `audit-maintenance` logs) is required to determine if the traffic is malicious. The validator’s \"high\" priority flag confirms this alert needs manual verification before any action.",
+          "automatic_flags": [],
+          "internal_reasoning_removed_from_display": true,
+          "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}
