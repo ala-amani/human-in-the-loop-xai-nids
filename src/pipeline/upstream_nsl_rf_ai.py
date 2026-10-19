@@ -76,7 +76,7 @@ def format_llm_commentary(narrative) -> str:
         ("Review recommendation", narrative.review_recommendation),
         ("Question for analyst", narrative.human_review_question),
     ]
-    heading = ("VERIFIED RULE-BASED FALLBACK (GENERATED TEXT WITHHELD)"
+    heading = ("DETERMINISTIC EVIDENCE SUMMARY (LLM TEXT WITHHELD)"
                if getattr(narrative, "source", "llm") == "deterministic_fallback"
                else "LOCAL LLM COMMENTARY (GENERATED; ADVISORY)")
     parts = [heading]
