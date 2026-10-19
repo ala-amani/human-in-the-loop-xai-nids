@@ -196,7 +196,7 @@ class OllamaNarrativeClient:
     ) -> str:
         """Continue a grounded English conversation about one detected event."""
         event_json = json.dumps(asdict(event), ensure_ascii=False, indent=2)
-        validation_json = json.dumps(asdict(validation), ensure_ascii=False, indent=2)
+        validation_json = json.dumps(asdict(validation) if validation else None, ensure_ascii=False, indent=2)
         messages = [{
             "role": "system",
             "content": (
