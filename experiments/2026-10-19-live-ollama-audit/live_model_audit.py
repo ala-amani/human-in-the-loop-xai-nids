@@ -135,7 +135,9 @@ def run(output_dir: Path, model: str, base_url: str, timeout: float) -> dict:
                     answer = client.chat(event, assessment, history, question)
                     record["responses"].append({
                         "kind": "interactive_chat", "question": question,
-                        "text": answer, "automatic_flags": response_flags(answer, event),
+                        "text": answer, "raw_model_content": client.last_raw_chat_content,
+                        "automatic_flags": response_flags(answer, event),
+                        "internal_reasoning_removed_from_display": "</think>" in client.last_raw_chat_content,
                         "human_semantic_review": "NOT_PERFORMED_BY_SCRIPT",
                     })
                     history.extend([{"role": "user", "content": question}, {"role": "assistant", "content": answer}])
