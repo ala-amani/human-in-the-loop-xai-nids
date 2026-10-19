@@ -334,7 +334,9 @@ class OllamaNarrativeClient:
             raise RuntimeError(f"Ollama is unavailable at {self.base_url}: {exc}") from exc
         self.last_raw_chat_content = str(body["message"]["content"])
         answer = strip_ollama_thinking(self.last_raw_chat_content)
-        self.last_chat_grounding_issues = numeric_grounding_issues(answer, event, validation)
+        issues = numeric_grounding_issues(answer, event, validation)
+        issues.extend(review_claim_issues(answer, validation))
+        self.last_chat_grounding_issues = sorted(set(issues))
         if self.last_chat_grounding_issues:
             return _verified_chat_fallback(event, validation, question)
         return answer
