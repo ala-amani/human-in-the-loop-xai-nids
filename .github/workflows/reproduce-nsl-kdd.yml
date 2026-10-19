@@ -1,0 +1,106 @@
+name: Reproduce NSL-KDD results from raw data
+
+on:
+  push:
+    paths:
+      - '.github/workflows/reproduce-nsl-kdd.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      FOLDER: experiments/2026-10-19-raw-reproduction
+      DATA_ROOT: ${{ runner.temp }}/nsl_kdd_raw
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned scientific dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.5 pandas==2.2.3 scikit-learn==1.8.0 scipy==1.17.0 matplotlib==3.10.8
+      - name: Download raw NSL-KDD from cited University of New Brunswick archive mirror
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$DATA_ROOT" "$FOLDER"
+          curl --fail --location --retry 4 --retry-delay 3 'https://raw.githubusercontent.com/jmnwong/NSL-KDD-Dataset/master/KDDTrain%2B.txt' --output "$DATA_ROOT/KDDTrain+.txt"
+          curl --fail --location --retry 4 --retry-delay 3 'https://raw.githubusercontent.com/jmnwong/NSL-KDD-Dataset/master/KDDTest%2B.txt' --output "$DATA_ROOT/KDDTest+.txt"
+          python - <<'PY'
+          import hashlib, json, os, pathlib, platform
+          import numpy, pandas, scipy, sklearn, matplotlib
+          root = pathlib.Path(os.environ["DATA_ROOT"])
+          records = {}
+          for file, count in [("KDDTrain+.txt", 125973), ("KDDTest+.txt", 22544)]:
+              path = root / file
+              n = sum(1 for _ in path.open("rb"))
+              assert n == count, (file, n, count)
+              records[file] = {"rows": n, "bytes": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+          provenance = {
+              "data_origin": "NSL-KDD data described at https://www.unb.ca/cic/datasets/nsl.html",
+              "download_mirror": "https://github.com/jmnwong/NSL-KDD-Dataset",
+              "note": "UNB currently states the official direct dataset download is unavailable; this uses a public archival mirror, NOT a fresh file from UNB.",
+              "data_files": records,
+              "python": platform.python_version(),
+              "packages": {"numpy": numpy.__version__, "pandas": pandas.__version__, "scikit-learn": sklearn.__version__, "scipy": scipy.__version__, "matplotlib": matplotlib.__version__},
+              "github_sha": os.environ.get("GITHUB_SHA"),
+          }
+          pathlib.Path(os.environ["FOLDER"], "provenance.json").write_text(json.dumps(provenance, indent=2), encoding="utf-8")
+          print(json.dumps(provenance, indent=2))
+          PY
+      - name: Recompute five matched-seed feedback experiments on raw rows
+        run: |
+          python experiments/2026-10-16-full-dataset-feedback/controlled/controlled_feedback_experiment.py --data-root "$DATA_ROOT" --output-dir "$FOLDER/controlled" --seeds 42 43 44 45 46 --folds 5 > "$FOLDER/controlled_run.log" 2>&1
+          tail -n 60 "$FOLDER/controlled_run.log"
+      - name: Recompute duplicate overlap on raw rows
+        run: |
+          python experiments/2026-10-16-full-dataset-feedback/analysis/duplicate_overlap_check.py --data-root "$DATA_ROOT" --output-dir "$FOLDER/analysis" --folds 5 > "$FOLDER/overlap_run.log" 2>&1
+          tail -n 50 "$FOLDER/overlap_run.log"
+      - name: Recompute five-seed sensitivity on raw rows
+        run: |
+          python experiments/2026-10-16-full-dataset-feedback/sensitivity/duplicate_sensitivity_experiment.py --data-root "$DATA_ROOT" --output-dir "$FOLDER/sensitivity" --seeds 42 43 44 45 46 --folds 5 > "$FOLDER/sensitivity_run.log" 2>&1
+          tail -n 50 "$FOLDER/sensitivity_run.log"
+      - name: Compare new raw-data results with archived manuscript claims
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          root=pathlib.Path(os.environ["FOLDER"])
+          c=json.loads((root/"controlled/controlled_results.json").read_text())
+          s=json.loads((root/"sensitivity/sensitivity_results.json").read_text())
+          a=json.loads(pathlib.Path("experiments/2026-10-16-full-dataset-feedback/controlled/controlled_results.json").read_text())
+          comparison={"observed":{},"archived":{},"absolute_differences":{},"row_counts_match":c["training_rows"]==125973 and c["test_rows"]==22544,"leakage_guards":c["leakage_guards"],"strict_rows":s["rows_evaluated_per_scenario"]["E_strict_cross_fold"]}
+          for key in ["false_positive_rate__false_positive_feedback","wrong_attack_class_rate__wrong_attack_class_feedback","attack_recall_binary__false_positive_feedback","accuracy__wrong_attack_class_feedback"]:
+              o=c["across_seed_summary"][key];h=a["across_seed_summary"][key]
+              comparison["observed"][key]={"control_mean":o["control"]["mean"],"feedback_mean":o["feedback"]["mean"]}
+              comparison["archived"][key]={"control_mean":h["control"]["mean"],"feedback_mean":h["feedback"]["mean"]}
+              comparison["absolute_differences"][key]={"control":abs(o["control"]["mean"]-h["control"]["mean"]),"feedback":abs(o["feedback"]["mean"]-h["feedback"]["mean"])}
+          comparison["exact_metric_match_1e-9"]=all(max(x.values()) < 1e-9 for x in comparison["absolute_differences"].values())
+          (root/"comparison.json").write_text(json.dumps(comparison,indent=2),encoding="utf-8")
+          print(json.dumps(comparison,indent=2))
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as out:
+              out.write("### Raw-data NSL-KDD reproduction\n")
+              out.write(f"Training rows: {c['training_rows']}; Test rows: {c['test_rows']}; Seeds: {c['seeds']}\n\n")
+              out.write(f"Exact archived metric match at 1e-9: {comparison['exact_metric_match_1e-9']}\n\n")
+              out.write("Run source, SHA256 checksums, metrics and comparison are in the committed reproduction folder.\n")
+          PY
+      - name: Persist raw-data reproduction evidence (without redistributing datasets)
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$FOLDER"
+          git commit -m "Archive independently rerun NSL-KDD outcomes and provenance" || echo "No changed results"
+          git push
+      - name: Upload reproduction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsl-kdd-raw-reproduction
+          path: ${{ env.FOLDER }}
+          if-no-files-found: warn
