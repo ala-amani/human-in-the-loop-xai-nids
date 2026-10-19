@@ -88,6 +88,18 @@ ATTACK_GLOSSARY = {
 }
 
 
+def strip_ollama_thinking(text: str) -> str:
+    """Return only the user-facing answer; retain raw output separately for audit."""
+    content = str(text).strip()
+    if "</think>" in content:
+        content = content.rsplit("</think>", 1)[-1].strip()
+    if "<think>" in content:
+        content = content.split("<think>", 1)[0].strip()
+    if not content:
+        raise RuntimeError("Ollama provided no user-facing answer")
+    return content
+
+
 class OllamaNarrativeClient:
     """Generate a grounded narrative through a local Ollama chat endpoint."""
 
@@ -101,6 +113,7 @@ class OllamaNarrativeClient:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.last_metrics: dict[str, float | int | str] = {}
+        self.last_raw_chat_content: str = ""
 
     def explain(
         self, event: AttackEvent, validation: Any | None = None, language: str = "English"
@@ -143,7 +156,7 @@ class OllamaNarrativeClient:
                         "the prediction. Treat confidence near 51 percent as low and borderline. A probability is "
                         "confidence, never confirmation. Explain the independent validation verdict and whether the "
                         "analyst should prioritize the alert for review. Ask the analyst to label the alert as correct, "
-                        "false positive, or wrong attack class. Never describe the validation estimate as ground truth."
+                        "false positive, or wrong attack class. Never describe the validation estimate as ground truth. The reliability score is an uncalibrated heuristic, not a probability. If no prior alerts have been reviewed, the Beta(1,1) historical-precision estimate of 0.5 is a prior, not measured classifier precision. Never claim that half of alerts were wrong when there are zero reviews. SHAP contributions are signed attribution units, never percentage-point changes in attack probability. Do not invent decision thresholds or extra numeric claims."
                     ),
                 },
                 {
@@ -189,7 +202,7 @@ class OllamaNarrativeClient:
             "content": (
                 "You are assisting a network security analyst with one IDS alert. Answer in clear, "
                 "concise English. Use only the supplied classifier prediction and SHAP evidence. "
-                "Do not invent packet contents, IP addresses, thresholds, or facts that are absent. "
+                "Do not invent packet contents, IP addresses, thresholds, or facts that are absent. Do not provide internal reasoning or thought transcripts. Provide only a concise final answer. SHAP contribution values are model attribution units, never percentage-point changes in classification probability. A historical precision of 0.5 with zero reviewed alerts is an uninformative Beta(1,1) prior, NOT 50 percent empirically correct or incorrect alerts. The reliability score is an uncalibrated heuristic, NOT a predicted probability of the alert being correct. Do not invent confidence cutoffs or thresholds. "
                 "Explain technical terms plainly. Say when the available evidence cannot answer a "
                 "question. SHAP explains model influence, not causality. Recommend verification; "
                 "never claim the attack is proven and never order an automatic shutdown. Explain that the validator "
@@ -202,7 +215,7 @@ class OllamaNarrativeClient:
             "model": self.model,
             "stream": False,
             "think": False,
-            "options": {"temperature": 0.1, "seed": 42},
+            "options": {"temperature": 0, "seed": 42},
             "messages": messages,
         }
         request = urllib.request.Request(
@@ -216,7 +229,8 @@ class OllamaNarrativeClient:
                 body = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as exc:
             raise RuntimeError(f"Ollama is unavailable at {self.base_url}: {exc}") from exc
-        return str(body["message"]["content"]).strip()
+        self.last_raw_chat_content = str(body["message"]["content"])
+        return strip_ollama_thinking(self.last_raw_chat_content)
 
 
 def explain_if_attack(
