@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - '.github/workflows/live-ollama-audit.yml'
+      - 'src/explainability/generative_explainer.py'
+      - 'experiments/2026-10-19-live-ollama-audit/live_model_audit.py'
+      - 'tests/test_ollama_answer_guardrails.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -36,19 +39,19 @@ jobs:
           ollama list
       - name: Run live Ollama audit
         run: |
-          PYTHONPATH=. python experiments/2026-10-19-live-ollama-audit/live_model_audit.py --model qwen3:4b --timeout 240 --output-dir experiments/2026-10-19-live-ollama-audit/run_outputs
+          PYTHONPATH=. python experiments/2026-10-19-live-ollama-audit/live_model_audit.py --model qwen3:4b --timeout 240 --output-dir experiments/2026-10-19-live-ollama-audit/run_outputs_guarded
       - name: Upload real model outputs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qwen3-4b-live-audit
-          path: experiments/2026-10-19-live-ollama-audit/run_outputs
+          path: experiments/2026-10-19-live-ollama-audit/run_outputs_guarded
           if-no-files-found: warn
       - name: Commit audit results
         if: success()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add experiments/2026-10-19-live-ollama-audit/run_outputs
+          git add experiments/2026-10-19-live-ollama-audit/run_outputs_guarded
           git commit -m 'Archive live Qwen3 Ollama audit results'
           git push
