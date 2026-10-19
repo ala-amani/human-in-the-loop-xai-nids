@@ -123,18 +123,23 @@ def show_attack_alert(
         (supporting if item.contribution >= 0 else opposing).append(line)
 
     confidence = event.confidence * 100
-    certainty = "low and borderline" if confidence < 60 else "moderate" if confidence < 80 else "high"
+    if assessment.reviewed_alerts == 0:
+        history_text = "Historical precision: unmeasured (Beta(1,1) prior, zero reviews)"
+    else:
+        history_text = (
+            f"Beta-smoothed reviewed-class precision: {assessment.historical_precision:.1%} "
+            f"from {assessment.reviewed_alerts} reviews"
+        )
     message = (
         "AI-ASSISTED INTRUSION ALERT\n\n"
         f"Detected class: {event.predicted_class}\n"
         f"Meaning: {attack_meanings.get(event.predicted_class, 'potential malicious network activity')}\n"
-        f"Model confidence: {confidence:.2f}% ({certainty})\n\n"
+        f"Model confidence: {confidence:.2f}% (model prediction, not ground truth)\n\n"
         "INDEPENDENT ALERT VALIDATION\n"
         f"Reliability score: {assessment.reliability_score:.3f}\n"
         f"Validation verdict: {assessment.verdict.replace('_', ' ')}\n"
         f"Evidence agreement: {assessment.evidence_agreement:.1%}\n"
-        f"Historical precision: {assessment.historical_precision:.1%} "
-        f"from {assessment.reviewed_alerts} reviewed alerts\n"
+        f"{history_text}\n"
         f"Human-review priority: {assessment.review_priority}\n\n"
         "WHY THE MODEL MADE THIS DECISION\n"
         "Evidence supporting the prediction:\n"
@@ -142,8 +147,8 @@ def show_attack_alert(
         + "\n\nEvidence opposing the prediction:\n"
         + ("\n".join(opposing) if opposing else "- No opposing feature was found.")
         + "\n\nRULE-BASED REVIEW CONTEXT\n"
-        f"The classifier labeled this flow as {event.predicted_class}, but the {confidence:.2f}% "
-        "confidence means the result is uncertain. Positive SHAP values pushed the model toward "
+        f"The classifier predicted {event.predicted_class} with {confidence:.2f}% confidence. "
+        "This prediction has not been independently verified. Positive SHAP values pushed the model toward "
         "this attack class; negative values pushed it away. This is an alert for analyst review, "
         "not proof of an attack.\n\n"
         "RECOMMENDED CHECKS\n"
