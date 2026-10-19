@@ -59,6 +59,30 @@ def _legacy_show_attack_alert(event: AttackEvent, narrative) -> None:
     root.destroy()
 
 
+def format_llm_commentary(narrative) -> str:
+    """Render structured LLM output separately from deterministic review context."""
+    if narrative is None:
+        return "LOCAL LLM COMMENTARY\nNo generated commentary available for this alert."
+
+    fields = [
+        ("Title", narrative.title),
+        ("Summary", narrative.summary),
+        ("Observed signs", narrative.observed_signs),
+        ("Reasoning", narrative.reasoning),
+        ("Confidence note", narrative.confidence_note),
+        ("Recommended checks", narrative.recommended_checks),
+        ("Limitations", narrative.limitations),
+        ("Validation verdict", narrative.validation_verdict),
+        ("Review recommendation", narrative.review_recommendation),
+        ("Question for analyst", narrative.human_review_question),
+    ]
+    parts = ["LOCAL LLM COMMENTARY (GENERATED; ADVISORY)"]
+    for label, value in fields:
+        rendered = "; ".join(str(item) for item in value) if isinstance(value, (list, tuple)) else str(value)
+        parts.append(f"{label}: {rendered}")
+    return "\n".join(parts)
+
+
 def show_attack_alert(
     event: AttackEvent,
     narrative,
@@ -114,7 +138,7 @@ def show_attack_alert(
         + ("\n".join(supporting) if supporting else "- No strong supporting feature was found.")
         + "\n\nEvidence opposing the prediction:\n"
         + ("\n".join(opposing) if opposing else "- No opposing feature was found.")
-        + "\n\nINTERPRETATION\n"
+        + "\n\nRULE-BASED REVIEW CONTEXT\n"
         f"The classifier labeled this flow as {event.predicted_class}, but the {confidence:.2f}% "
         "confidence means the result is uncertain. Positive SHAP values pushed the model toward "
         "this attack class; negative values pushed it away. This is an alert for analyst review, "
@@ -124,11 +148,12 @@ def show_attack_alert(
         "- Check whether the same source contacted many ports, hosts, or services in a short period.\n"
         "- Compare the event with firewall, router, and authentication logs.\n"
         "- Do not automatically disconnect or block the system based only on this prediction.\n\n"
-        "The LLM interpretation shown above is advisory. The analyst must read it together with "
+        "Generated LLM commentary, when available below, is advisory. The analyst must read it together with "
         "the displayed XAI evidence and operational records, decide whether the IDS prediction is "
         "correct, a false positive, or the wrong attack class, and record the reviewed outcome below. "
         "Validated feedback is stored for controlled IDS retraining; it does not update firewall policy."
     )
+    message += "\n\n" + format_llm_commentary(narrative)
     root = tk.Tk()
     root.title("AI-Assisted Intrusion Detection Chat")
     root.geometry("960x760")
