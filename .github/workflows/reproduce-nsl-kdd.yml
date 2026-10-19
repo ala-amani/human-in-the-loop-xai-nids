@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 55
     env:
       FOLDER: experiments/2026-10-19-raw-reproduction
-      DATA_ROOT: ${{ runner.temp }}/nsl_kdd_raw
+      DATA_ROOT: /tmp/nsl_kdd_raw
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
