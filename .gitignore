@@ -35,3 +35,6 @@ references/upstream/XAI_NIDS/
 AGENTS.md
 .DS_Store
 Thumbs.db
+
+# Local-only list of terms for tests/test_repository_hygiene.py
+tests/.hygiene_terms.txt
